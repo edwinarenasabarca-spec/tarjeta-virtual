@@ -22,7 +22,7 @@
       --text-gold: #8c6239;
       --script: 'Great Vibes', cursive;
       --ornate-script: 'Luxurious Script', 'Alex Brush', cursive;
-      --editorial-serif: 'Cinzel', 'Cormorant Garamond', serif;
+      --editorial-serif: 'Cormorant Garamond', 'Cinzel', serif;
       --sans: 'Montserrat', sans-serif;
     }
 
@@ -45,7 +45,8 @@
       overflow-x: hidden;
       width: 100%;
       background-image: radial-gradient(rgba(255, 255, 255, 0.8), rgba(244, 240, 234, 0.9)), url('https://www.transparenttextures.com/patterns/cream-paper.png');
-      letter-spacing: 0.8px;
+      letter-spacing: 0.5px;
+      text-transform: none; /* Mantiene las mayúsculas y minúsculas originales */
     }
 
     /* Bloquea el scroll vertical mientras el sobre está cerrado */
@@ -101,6 +102,7 @@
       animation: 
         titleSoftFall 2.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards,
         titleGentleBreeze 5s ease-in-out 2.9s infinite;
+      text-transform: none;
     }
 
     /* Contenedor principal del sobre más ancho */
@@ -268,11 +270,11 @@
       color: #fff;
       font-family: var(--editorial-serif);
       font-size: clamp(0.8rem, 2.8vw, 0.95rem);
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
+      letter-spacing: 1.5px;
       text-align: center;
       opacity: 0;
       animation: hintFadeIn 1s ease 1.9s forwards;
+      text-transform: none;
     }
 
     /* =========================================================
@@ -471,7 +473,7 @@
       font-family: var(--editorial-serif);
       font-size: clamp(1.4rem, 4.5vw, 2.4rem);
       font-weight: 500;
-      letter-spacing: 5px;
+      letter-spacing: 3px;
       margin-top: 10px;
       color: #e5d8c5;
       text-shadow: 0 2px 8px #0008;
@@ -491,7 +493,8 @@
       font-family: var(--editorial-serif);
       font-size: clamp(1.1rem, 3.8vw, 1.3rem);
       margin-bottom: 14px;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
+      text-transform: none;
     }
 
     /* Botón circular para reproducir/pausar música */
@@ -535,7 +538,7 @@
       font-style: italic;
       display: block;
       margin: 4px 0;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
     }
 
     /* Ramo de flores ornamental en SVG */
@@ -547,7 +550,7 @@
       filter: drop-shadow(0 2px 4px rgba(152, 71, 52, 0.12));
     }
 
-    /* Frases y textos descriptivos con tamaño optimizado para móviles */
+    /* Frases y textos descriptivos con tamaño optimizado y minúsculas naturales */
     .quote-text {
       font-family: var(--editorial-serif);
       font-size: clamp(1.15rem, 3.9vw, 1.45rem);
@@ -556,7 +559,8 @@
       margin: 0 auto clamp(25px, 5vw, 35px);
       color: #5a4b44;
       padding: 0 4px;
-      letter-spacing: 1.2px;
+      letter-spacing: 0.5px;
+      text-transform: none;
     }
 
     /* =========================================================
@@ -585,13 +589,13 @@
       font-weight: 500;
       line-height: 1;
       color: #8c583a;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
     }
 
     .time-label {
       font-family: var(--editorial-serif);
       font-size: clamp(0.65rem, 2.3vw, 0.8rem);
-      letter-spacing: 2px;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
       margin-top: 6px;
       color: #7c685b;
@@ -630,7 +634,7 @@
     .section-pre-title {
       font-family: var(--editorial-serif);
       font-size: clamp(0.85rem, 2.8vw, 1rem);
-      letter-spacing: 3px;
+      letter-spacing: 2px;
       text-transform: uppercase;
       color: #6e5d54;
       margin-bottom: 8px;
@@ -643,6 +647,7 @@
       font-weight: 400;
       margin-bottom: 5px;
       line-height: 1.15;
+      text-transform: none;
     }
 
     /* Divisor de línea con corazón en el centro */
@@ -676,7 +681,7 @@
       font-family: var(--editorial-serif);
       font-weight: 600;
       font-size: clamp(0.95rem, 3vw, 1.1rem);
-      letter-spacing: 2.5px;
+      letter-spacing: 2px;
       text-transform: uppercase;
       margin-bottom: 6px;
       color: var(--terracotta);
@@ -687,7 +692,8 @@
       font-size: clamp(1.12rem, 3.8vw, 1.35rem);
       line-height: 1.65;
       color: #5c4e47;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
+      text-transform: none;
     }
 
     .padrinos-group {
@@ -714,7 +720,7 @@
     .calendar-month {
       font-family: var(--editorial-serif);
       font-size: clamp(1.25rem, 4.2vw, 1.6rem);
-      letter-spacing: clamp(4px, 1.5vw, 8px);
+      letter-spacing: 3px;
       text-transform: uppercase;
       color: var(--terracotta);
       font-weight: 600;
@@ -735,7 +741,7 @@
       color: var(--terracotta);
       font-weight: 600;
       margin-bottom: 10px;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
     }
 
     .day-num {
@@ -748,7 +754,7 @@
       align-items: center;
       justify-content: center;
       height: clamp(52px, 13vw, 70px);
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
     }
 
     .day-selected {
@@ -858,8 +864,9 @@
     .event-time {
       font-family: var(--editorial-serif);
       font-size: clamp(1.35rem, 4.6vw, 1.8rem);
-      letter-spacing: 2px;
+      letter-spacing: 1.5px;
       margin-bottom: 6px;
+      text-transform: none;
     }
 
     .event-place {
@@ -868,7 +875,8 @@
       font-weight: 500;
       line-height: 1.4;
       margin-bottom: 22px;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
+      text-transform: none;
     }
 
     /* Botón blanco para abrir Google Maps */
@@ -878,12 +886,13 @@
       color: var(--terracotta);
       font-family: var(--editorial-serif);
       font-size: clamp(1.15rem, 3.8vw, 1.38rem);
-      letter-spacing: 2px;
+      letter-spacing: 1.5px;
       padding: clamp(11px, 2.8vw, 13px) clamp(32px, 8vw, 45px);
       border-radius: 40px;
       text-decoration: none;
       box-shadow: 0 4px 15px #0002;
       transition: transform 0.2s ease;
+      text-transform: none;
     }
 
     .btn-white:active {
@@ -895,14 +904,16 @@
       font-size: clamp(1.25rem, 4.2vw, 1.6rem);
       line-height: 1.7;
       margin-bottom: 16px;
-      letter-spacing: 1.2px;
+      letter-spacing: 0.8px;
+      text-transform: none;
     }
 
     .avoid-colors-text {
       font-family: var(--editorial-serif);
       font-size: clamp(1.1rem, 3.6vw, 1.3rem);
       margin-bottom: 18px;
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
+      text-transform: none;
     }
 
     .color-palette {
@@ -928,7 +939,8 @@
       line-height: 1.5;
       font-weight: 500;
       padding: 0 8px;
-      letter-spacing: 1.2px;
+      letter-spacing: 0.8px;
+      text-transform: none;
     }
 
     /* =========================================================
@@ -1043,7 +1055,8 @@
       font-family: var(--editorial-serif);
       font-size: clamp(1.02rem, 3.4vw, 1.2rem);
       font-weight: 600;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
+      text-transform: none;
     }
 
     .timeline-title {
@@ -1051,7 +1064,8 @@
       font-size: clamp(1.02rem, 3.4vw, 1.2rem);
       color: #5c4e47;
       line-height: 1.35;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
+      text-transform: none;
     }
 
     /* =========================================================
@@ -1079,10 +1093,11 @@
       font-size: clamp(1.02rem, 3.4vw, 1.25rem);
       line-height: 1.75;
       color: #4a3e39;
-      letter-spacing: 1.1px;
+      letter-spacing: 0.8px;
       overflow-wrap: break-word;
       word-break: break-word;
       padding: 0 6px;
+      text-transform: none;
     }
 
     .bank-name {
@@ -1090,7 +1105,7 @@
       font-weight: 700;
       font-size: clamp(1.2rem, 4vw, 1.45rem);
       margin-bottom: 6px;
-      letter-spacing: 2px;
+      letter-spacing: 1.5px;
     }
 
     /* =========================================================
@@ -1142,13 +1157,14 @@
       font-family: var(--editorial-serif);
       font-size: clamp(1.2rem, 4vw, 1.4rem);
       font-weight: 500;
-      letter-spacing: 2px;
+      letter-spacing: 1.5px;
       padding: clamp(12px, 3vw, 15px) clamp(38px, 9vw, 52px);
       border-radius: 35px;
       text-decoration: none;
       margin-top: 22px;
       box-shadow: 0 5px 15px #98473459;
       transition: background 0.2s ease, transform 0.2s ease;
+      text-transform: none;
     }
 
     .btn-terracotta:hover {
@@ -1316,7 +1332,7 @@
         <circle cx="0" cy="-10" r="8" fill="#e6a97c"/>
         <circle cx="9.5" cy="-3" r="8" fill="#df9b6d"/>
         <circle cx="6" cy="8" r="8" fill="#e6a97c"/>
-        <circle cx="-6" cy="8" r="8" fill="#df9b6d"/>
+        <circle cx="-6" cy="8" r="8" fill="#e6a97c"/>
         <circle cx="-9.5" cy="-3" r="8" fill="#e6a97c"/>
         <circle cx="0" cy="0" r="5.5" fill="#984734"/>
         <circle cx="-1.5" cy="-1.5" r="2" fill="#f7e3d4"/>
@@ -1325,7 +1341,7 @@
         <circle cx="0" cy="-10" r="8" fill="#e6a97c"/>
         <circle cx="9.5" cy="-3" r="8" fill="#df9b6d"/>
         <circle cx="6" cy="8" r="8" fill="#e6a97c"/>
-        <circle cx="-6" cy="8" r="8" fill="#df9b6d"/>
+        <circle cx="-6" cy="8" r="8" fill="#e6a97c"/>
         <circle cx="-9.5" cy="-3" r="8" fill="#e6a97c"/>
         <circle cx="0" cy="0" r="5.5" fill="#984734"/>
         <circle cx="-1.5" cy="-1.5" r="2" fill="#f7e3d4"/>
@@ -1384,16 +1400,16 @@
 
     <!-- Padres y Padrinos -->
     <div class="reveal">
-      <p class="section-pre-title">CON LA BENDICIÓN DE DIOS Y</p>
+      <p class="section-pre-title">con la bendición de Dios y</p>
       <h2 class="script-heading">Nuestros padres</h2>
       <div class="heart-divider"><span>♥</span></div>
 
       <div class="parents-block">
-        <p class="parents-role">NOVIA:</p>
+        <p class="parents-role">Novia:</p>
         <p class="parents-names">Juan Cáceres Pumachoque<br>Carmela Cano Soneco</p>
       </div>
       <div class="parents-block">
-        <p class="parents-role">NOVIO:</p>
+        <p class="parents-role">Novio:</p>
         <p class="parents-names">Juan Cairo Florez<br>Luisa F. Quispe Núñez del Prado</p>
       </div>
 
@@ -1447,7 +1463,7 @@
       </svg>
 
       <p class="quote-text" style="margin-bottom:10px">Tenemos el honor de invitarlos a nuestra boda</p>
-      <div class="calendar-month">NOVIEMBRE 2026</div>
+      <div class="calendar-month">Noviembre 2026</div>
 
       <div class="calendar-week">
         <!-- Encabezados de días -->
