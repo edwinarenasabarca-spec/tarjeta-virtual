@@ -2,7 +2,11 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#984734">
   <title>Nuestra Boda - Miluska &amp; Juan Rosvelt</title>
   
   <!-- Importación de fuentes desde Google Fonts -->
@@ -38,6 +42,18 @@
       -webkit-text-size-adjust: 100%;
     }
 
+    /* Garantiza que el modo pantalla completa permita deslizar en móviles */
+    html:fullscreen,
+    html:-webkit-full-screen,
+    body:fullscreen,
+    body:-webkit-full-screen {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      width: 100%;
+      height: 100%;
+      background-color: var(--cream-bg);
+    }
+
     body {
       font-family: var(--editorial-serif);
       background: var(--cream-bg);
@@ -51,7 +67,7 @@
 
     /* Bloquea el scroll vertical mientras el sobre está cerrado */
     body.no-scroll {
-      overflow: hidden;
+      overflow: hidden !important;
       height: 100vh;
       height: 100dvh;
     }
@@ -1710,7 +1726,25 @@
       });
     });
 
-    /* 2. Controlador robusto de música con respaldo automático de fuentes */
+    /* 2. Función para activar Pantalla Completa al 100% (oculta la barra de URL) */
+    function enterFullScreenMode() {
+      const docEl = document.documentElement;
+      try {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          if (docEl.requestFullscreen) {
+            docEl.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+          } else if (docEl.webkitRequestFullscreen) {
+            docEl.webkitRequestFullscreen();
+          } else if (docEl.msRequestFullscreen) {
+            docEl.msRequestFullscreen();
+          }
+        }
+      } catch (err) {
+        // Continúa normalmente si el navegador restringe el modo fullscreen
+      }
+    }
+
+    /* 3. Controlador robusto de música con respaldo automático de fuentes */
     const openEnvelopeBtn = document.getElementById('open-envelope-btn');
     const envelopeScreen = document.getElementById('envelope-screen');
     const audio = document.getElementById('wedding-audio');
@@ -1731,7 +1765,6 @@
 
     audio.volume = 0.75;
 
-    // Sincroniza el ícono directamente con el estado real del elemento <audio>
     function syncMusicIcons() {
       const playing = !audio.paused && !audio.ended;
       playIcon.style.display = playing ? 'none' : 'block';
@@ -1743,7 +1776,6 @@
     audio.addEventListener('pause', syncMusicIcons);
     audio.addEventListener('ended', syncMusicIcons);
 
-    // Si una ruta de audio falla al cargar, salta automáticamente a la siguiente disponible
     audio.addEventListener('error', () => {
       currentAudioIndex++;
       if (currentAudioIndex < audioSources.length) {
@@ -1755,7 +1787,6 @@
       }
     });
 
-    // Función segura para iniciar reproducción
     function tryPlayMusic() {
       userWantsMusic = true;
       if (audio.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
@@ -1777,7 +1808,6 @@
       syncMusicIcons();
     }
 
-    // Botón manual de Play / Pausa (obedece siempre al estado real del reproductor)
     musicToggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       if (audio.paused) {
@@ -1787,13 +1817,13 @@
       }
     });
 
-    /* 3. Sistema de Auto-Scroll suave que se detiene cuando el usuario desliza por su cuenta */
+    /* 4. Sistema de Auto-Scroll compatible con Pantalla Completa */
     let autoScrollDelayTimer = null;
     let autoScrollRafId = null;
     let isAutoScrolling = false;
     let lastFrameTime = null;
     let pixelRemainder = 0;
-    const SCROLL_SPEED_PX_PER_SEC = 75; // Velocidad suave de lectura (píxeles por segundo)
+    const SCROLL_SPEED_PX_PER_SEC = 75;
 
     function stopAutoScroll() {
       if (autoScrollDelayTimer) {
@@ -1812,7 +1842,6 @@
     }
 
     function onUserManualInteraction(e) {
-      // No detener el auto-scroll si el usuario únicamente tocó el botón de música
       if (e.target && e.target.closest('#music-toggle-btn')) {
         return;
       }
@@ -1846,18 +1875,27 @@
       const deltaMs = timestamp - lastFrameTime;
       lastFrameTime = timestamp;
 
-      // Acumulador de subpíxeles para movimiento fluido en cualquier pantalla (60Hz / 120Hz)
       pixelRemainder += (SCROLL_SPEED_PX_PER_SEC * deltaMs) / 1000;
       const pixelsToMove = Math.floor(pixelRemainder);
 
       if (pixelsToMove >= 1) {
+        const scrollEl = document.scrollingElement || document.documentElement;
+        const prevTop = scrollEl.scrollTop;
         window.scrollBy(0, pixelsToMove);
+
+        // Respaldo directo si el navegador en modo Fullscreen usa documentElement o body
+        if (scrollEl.scrollTop === prevTop) {
+          scrollEl.scrollTop += pixelsToMove;
+          document.body.scrollTop += pixelsToMove;
+        }
         pixelRemainder -= pixelsToMove;
       }
 
-      // Detener automáticamente al llegar al final de la invitación
-      const atBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 2);
-      if (atBottom) {
+      const scrollEl = document.scrollingElement || document.documentElement;
+      const currentScroll = Math.max(window.scrollY, scrollEl.scrollTop, document.body.scrollTop);
+      const totalHeight = Math.max(scrollEl.scrollHeight, document.body.scrollHeight);
+
+      if ((window.innerHeight + currentScroll) >= (totalHeight - 2)) {
         stopAutoScroll();
         return;
       }
@@ -1871,18 +1909,20 @@
         isAutoScrolling = true;
         lastFrameTime = null;
         pixelRemainder = 0;
-        // Desactiva temporalmente scroll-behavior: smooth de CSS para evitar tirones cuadro a cuadro
         document.documentElement.style.scrollBehavior = 'auto';
         autoScrollRafId = requestAnimationFrame(autoScrollStep);
       }, delayMs);
     }
 
-    /* 4. Evento al tocar el sello de lacre: abre el sobre, inicia música y programa el auto-scroll */
+    /* 5. Evento al tocar el sello: entra a Pantalla Completa 100%, inicia música y auto-scroll */
     let envelopeOpened = false;
 
     openEnvelopeBtn.addEventListener('click', () => {
       if (envelopeOpened) return;
       envelopeOpened = true;
+
+      // Solicita pantalla completa al instante dentro del gesto de clic del usuario
+      enterFullScreenMode();
 
       envelopeScreen.classList.add('opening');
       tryPlayMusic();
@@ -1892,12 +1932,11 @@
         document.body.classList.remove('no-scroll');
         document.body.classList.add('invitation-opened');
 
-        // Espera 2.5 segundos para apreciar la portada antes de deslizar automáticamente
         startAutoScrollAfterDelay(2500);
       }, 380);
     });
 
-    /* 5. Lógica de la cuenta regresiva (27 de noviembre de 2026 a las 09:00 a.m.) */
+    /* 6. Lógica de la cuenta regresiva (27 de noviembre de 2026 a las 09:00 a.m.) */
     const weddingDate = new Date(2026, 10, 27, 9, 0, 0).getTime();
 
     function updateCountdown() {
@@ -1926,7 +1965,7 @@
     updateCountdown();
     setInterval(updateCountdown, 1000);
 
-    /* 6. Observador de intersección para animar las secciones suavemente al hacer scroll */
+    /* 7. Observador de intersección para animar las secciones suavemente al hacer scroll */
     const revealObserver = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
