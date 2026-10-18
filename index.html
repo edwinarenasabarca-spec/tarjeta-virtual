@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-  <meta name="mobile-web-app-capable" content="yes">
+  <!-- Tiñe la barra superior del navegador móvil para integrarla al diseño sin mostrar avisos de sistema -->
+  <meta name="theme-color" content="#c98863" id="theme-color-meta">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#984734">
   <title>Nuestra Boda - Miluska &amp; Juan Rosvelt</title>
   
   <!-- Importación de fuentes desde Google Fonts -->
@@ -40,18 +40,6 @@
     html {
       scroll-behavior: smooth;
       -webkit-text-size-adjust: 100%;
-    }
-
-    /* Garantiza que el modo pantalla completa permita deslizar en móviles */
-    html:fullscreen,
-    html:-webkit-full-screen,
-    body:fullscreen,
-    body:-webkit-full-screen {
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-      width: 100%;
-      height: 100%;
-      background-color: var(--cream-bg);
     }
 
     body {
@@ -280,18 +268,6 @@
       user-select: none;
     }
 
-    /* Texto inferior de indicación */
-    .click-hint {
-      margin-top: clamp(8px, 2vh, 16px);
-      color: #fff;
-      font-family: 'Great Vibes', cursive;
-      font-size: clamp(1.4rem, 2.8vw, 1.9rem);
-      text-align: center;
-      opacity: 0;
-      animation: hintFadeIn 1s ease 1.9s forwards;
-      text-transform: none;
-    }
-
     /* =========================================================
        KEYFRAMES DE ANIMACIÓN DEL SOBRE Y TÍTULO CAYENDO
        ========================================================= */
@@ -402,17 +378,6 @@
       }
       50% {
         transform: translate(-50%, -50%) scale(1.07);
-      }
-    }
-
-    @keyframes hintFadeIn {
-      0% {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
       }
     }
 
@@ -1246,10 +1211,6 @@
       .envelope-container-box {
         width: min(50vw, 68vh, 310px);
       }
-      .click-hint {
-        margin-top: 4px;
-        font-size: 0.65rem;
-      }
       .hero-section {
         min-height: 100dvh;
         padding-top: 25px;
@@ -1726,31 +1687,14 @@
       });
     });
 
-    /* 2. Función para activar Pantalla Completa al 100% (oculta la barra de URL) */
-    function enterFullScreenMode() {
-      const docEl = document.documentElement;
-      try {
-        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-          if (docEl.requestFullscreen) {
-            docEl.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
-          } else if (docEl.webkitRequestFullscreen) {
-            docEl.webkitRequestFullscreen();
-          } else if (docEl.msRequestFullscreen) {
-            docEl.msRequestFullscreen();
-          }
-        }
-      } catch (err) {
-        // Continúa normalmente si el navegador restringe el modo fullscreen
-      }
-    }
-
-    /* 3. Controlador robusto de música con respaldo automático de fuentes */
+    /* 2. Controlador robusto de música con respaldo automático de fuentes */
     const openEnvelopeBtn = document.getElementById('open-envelope-btn');
     const envelopeScreen = document.getElementById('envelope-screen');
     const audio = document.getElementById('wedding-audio');
     const musicToggleBtn = document.getElementById('music-toggle-btn');
     const playIcon = document.getElementById('play-icon');
     const pauseIcon = document.getElementById('pause-icon');
+    const themeColorMeta = document.getElementById('theme-color-meta');
 
     const audioSources = [
       'musica.mp3',
@@ -1817,7 +1761,7 @@
       }
     });
 
-    /* 4. Sistema de Auto-Scroll compatible con Pantalla Completa */
+    /* 3. Sistema de Auto-Scroll suave hasta que el usuario deslice por su cuenta */
     let autoScrollDelayTimer = null;
     let autoScrollRafId = null;
     let isAutoScrolling = false;
@@ -1879,21 +1823,13 @@
       const pixelsToMove = Math.floor(pixelRemainder);
 
       if (pixelsToMove >= 1) {
-        const scrollEl = document.scrollingElement || document.documentElement;
-        const prevTop = scrollEl.scrollTop;
         window.scrollBy(0, pixelsToMove);
-
-        // Respaldo directo si el navegador en modo Fullscreen usa documentElement o body
-        if (scrollEl.scrollTop === prevTop) {
-          scrollEl.scrollTop += pixelsToMove;
-          document.body.scrollTop += pixelsToMove;
-        }
         pixelRemainder -= pixelsToMove;
       }
 
       const scrollEl = document.scrollingElement || document.documentElement;
-      const currentScroll = Math.max(window.scrollY, scrollEl.scrollTop, document.body.scrollTop);
-      const totalHeight = Math.max(scrollEl.scrollHeight, document.body.scrollHeight);
+      const currentScroll = Math.max(window.scrollY, scrollEl.scrollTop);
+      const totalHeight = scrollEl.scrollHeight;
 
       if ((window.innerHeight + currentScroll) >= (totalHeight - 2)) {
         stopAutoScroll();
@@ -1914,18 +1850,20 @@
       }, delayMs);
     }
 
-    /* 5. Evento al tocar el sello: entra a Pantalla Completa 100%, inicia música y auto-scroll */
+    /* 4. Evento al tocar el sello: abre el sobre sin aviso de sistema, inicia música y auto-scroll */
     let envelopeOpened = false;
 
     openEnvelopeBtn.addEventListener('click', () => {
       if (envelopeOpened) return;
       envelopeOpened = true;
 
-      // Solicita pantalla completa al instante dentro del gesto de clic del usuario
-      enterFullScreenMode();
-
       envelopeScreen.classList.add('opening');
       tryPlayMusic();
+
+      // Cambia suavemente el color de la barra superior al tono terracota de la boda
+      if (themeColorMeta) {
+        themeColorMeta.setAttribute('content', '#984734');
+      }
 
       setTimeout(() => {
         envelopeScreen.classList.add('hidden');
@@ -1936,7 +1874,7 @@
       }, 380);
     });
 
-    /* 6. Lógica de la cuenta regresiva (27 de noviembre de 2026 a las 09:00 a.m.) */
+    /* 5. Lógica de la cuenta regresiva (27 de noviembre de 2026 a las 09:00 a.m.) */
     const weddingDate = new Date(2026, 10, 27, 9, 0, 0).getTime();
 
     function updateCountdown() {
@@ -1965,7 +1903,7 @@
     updateCountdown();
     setInterval(updateCountdown, 1000);
 
-    /* 7. Observador de intersección para animar las secciones suavemente al hacer scroll */
+    /* 6. Observador de intersección para animar las secciones suavemente al hacer scroll */
     const revealObserver = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
