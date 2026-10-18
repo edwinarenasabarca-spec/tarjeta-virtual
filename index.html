@@ -46,7 +46,7 @@
       width: 100%;
       background-image: radial-gradient(rgba(255, 255, 255, 0.8), rgba(244, 240, 234, 0.9)), url('https://www.transparenttextures.com/patterns/cream-paper.png');
       letter-spacing: 0.5px;
-      text-transform: none; /* Mantiene las mayúsculas y minúsculas originales */
+      text-transform: none;
     }
 
     /* Bloquea el scroll vertical mientras el sobre está cerrado */
@@ -264,18 +264,16 @@
       user-select: none;
     }
 
-    /* Texto inferior de indicación: "Toca el sello para abrir" */
+    /* Texto inferior de indicación */
     .click-hint {
-      margin-top: clamp(8px, 2vh, 16px); */
-    color: #fff;
-    font-family: var(--editorial-serif);
-    font-size: clamp(1.9rem, 2.8vw, 0.95rem);
-    /* letter-spacing: 1.5px; */
-    text-align: center;
-    opacity: 0;
-    animation: hintFadeIn 1s ease 1.9s forwards;
-    text-transform: none;
-    font-family: 'Great Vibes';
+      margin-top: clamp(8px, 2vh, 16px);
+      color: #fff;
+      font-family: 'Great Vibes', cursive;
+      font-size: clamp(1.4rem, 2.8vw, 1.9rem);
+      text-align: center;
+      opacity: 0;
+      animation: hintFadeIn 1s ease 1.9s forwards;
+      text-transform: none;
     }
 
     /* =========================================================
@@ -522,6 +520,10 @@
       background: var(--terracotta-dark);
     }
 
+    .play-btn:active {
+      transform: scale(0.95);
+    }
+
     /* Nombres de los novios */
     .couple-names {
       font-family: var(--script);
@@ -551,7 +553,7 @@
       filter: drop-shadow(0 2px 4px rgba(152, 71, 52, 0.12));
     }
 
-    /* Frases y textos descriptivos con tamaño optimizado y minúsculas naturales */
+    /* Frases y textos descriptivos */
     .quote-text {
       font-family: var(--editorial-serif);
       font-size: clamp(1.15rem, 3.9vw, 1.45rem);
@@ -1242,15 +1244,9 @@
 <body class="no-scroll">
 
   <!-- =========================================================
-       AUDIO DE FONDO (BODA)
+       AUDIO DE FONDO (GESTIONADO CON RESPALDO INTELIGENTE EN JS)
        ========================================================= -->
-  <audio id="wedding-audio" loop preload="auto">
-    <source src="musica.mp3" type="audio/mpeg">
-    <source src="file:///C:/Users/HP/Downloads/musica.mp3" type="audio/mpeg">
-    <source src="file:///C:/Users/HP/Descargas/musica.mp3" type="audio/mpeg">
-    <source src="https://upload.wikimedia.org/wikipedia/commons/transcoded/6/62/Pachelbel%27s_Canon.ogg/Pachelbel%27s_Canon.ogg.mp3" type="audio/mpeg">
-    <source src="https://upload.wikimedia.org/wikipedia/commons/6/62/Pachelbel%27s_Canon.ogg" type="audio/ogg">
-  </audio>
+  <audio id="wedding-audio" src="musica.mp3" loop preload="auto"></audio>
 
   <!-- =========================================================
        PANTALLA DE BIENVENIDA (SOBRE INTERACTIVO)
@@ -1284,8 +1280,6 @@
         <span>MR</span>
       </button>
     </div>
-
-    
   </div>
 
   <!-- =========================================================
@@ -1303,7 +1297,7 @@
   <section class="section-container reveal">
     <!-- Botón de control de música -->
     <p class="music-prompt">Dale play para escuchar nuestra canción</p>
-    <button class="play-btn" id="music-toggle-btn" aria-label="Reproducir o pausar música">
+    <button class="play-btn" id="music-toggle-btn" type="button" aria-label="Reproducir o pausar música">
       <svg id="play-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
         <path d="M8 5v14l11-7z"/>
       </svg>
@@ -1701,7 +1695,7 @@
        SCRIPTS DE FUNCIONALIDAD (JAVASCRIPT)
        ========================================================= -->
   <script>
-    /* 1. Respaldo automático de rutas para cargar la imagen del sobre desde la carpeta actual o Descargas */
+    /* 1. Respaldo automático de rutas para cargar la imagen del sobre */
     const fallbackPaths = [
       'file:///C:/Users/HP/Downloads/e083adb17cefc21b1eb6b92a1c888829.png',
       'file:///C:/Users/HP/Descargas/e083adb17cefc21b1eb6b92a1c888829.png'
@@ -1716,56 +1710,192 @@
       });
     });
 
-    /* 2. Referencias a elementos del DOM para el sobre y la música */
+    /* 2. Controlador robusto de música con respaldo automático de fuentes */
     const openEnvelopeBtn = document.getElementById('open-envelope-btn');
     const envelopeScreen = document.getElementById('envelope-screen');
     const audio = document.getElementById('wedding-audio');
     const musicToggleBtn = document.getElementById('music-toggle-btn');
     const playIcon = document.getElementById('play-icon');
     const pauseIcon = document.getElementById('pause-icon');
-    let isPlaying = false;
 
-    // Volumen inicial al 75%
+    const audioSources = [
+      'musica.mp3',
+      'file:///C:/Users/HP/Downloads/musica.mp3',
+      'file:///C:/Users/HP/Descargas/musica.mp3',
+      'https://upload.wikimedia.org/wikipedia/commons/transcoded/6/62/Pachelbel%27s_Canon.ogg/Pachelbel%27s_Canon.ogg.mp3',
+      'https://upload.wikimedia.org/wikipedia/commons/6/62/Pachelbel%27s_Canon.ogg'
+    ];
+
+    let currentAudioIndex = 0;
+    let userWantsMusic = false;
+
     audio.volume = 0.75;
 
-    // Actualiza el icono de Play / Pausa
-    function updateMusicButton(playing) {
-      isPlaying = playing;
+    // Sincroniza el ícono directamente con el estado real del elemento <audio>
+    function syncMusicIcons() {
+      const playing = !audio.paused && !audio.ended;
       playIcon.style.display = playing ? 'none' : 'block';
       pauseIcon.style.display = playing ? 'block' : 'none';
     }
 
-    /* 3. Evento al tocar el sello de lacre: anima la tarjeta, oculta el sobre e inicia la música */
-    openEnvelopeBtn.addEventListener('click', () => {
-      envelopeScreen.classList.add('opening');
-      
-      setTimeout(() => {
-        envelopeScreen.classList.add('hidden');
-        document.body.classList.remove('no-scroll');
-        document.body.classList.add('invitation-opened');
-      }, 380);
+    audio.addEventListener('play', syncMusicIcons);
+    audio.addEventListener('playing', syncMusicIcons);
+    audio.addEventListener('pause', syncMusicIcons);
+    audio.addEventListener('ended', syncMusicIcons);
 
-      audio.play()
-        .then(() => updateMusicButton(true))
-        .catch(() => updateMusicButton(false));
-    });
-
-    /* 4. Evento del botón circular para pausar o reanudar la música manualmente */
-    musicToggleBtn.addEventListener('click', async () => {
-      if (isPlaying) {
-        audio.pause();
-        updateMusicButton(false);
-      } else {
-        try {
-          await audio.play();
-          updateMusicButton(true);
-        } catch (e) {
-          updateMusicButton(false);
+    // Si una ruta de audio falla al cargar, salta automáticamente a la siguiente disponible
+    audio.addEventListener('error', () => {
+      currentAudioIndex++;
+      if (currentAudioIndex < audioSources.length) {
+        audio.src = audioSources[currentAudioIndex];
+        audio.load();
+        if (userWantsMusic) {
+          audio.play().catch(() => syncMusicIcons());
         }
       }
     });
 
-    audio.addEventListener('ended', () => updateMusicButton(false));
+    // Función segura para iniciar reproducción
+    function tryPlayMusic() {
+      userWantsMusic = true;
+      if (audio.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
+        currentAudioIndex = 0;
+        audio.src = audioSources[currentAudioIndex];
+        audio.load();
+      }
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => syncMusicIcons())
+          .catch(() => syncMusicIcons());
+      }
+    }
+
+    function pauseMusic() {
+      userWantsMusic = false;
+      audio.pause();
+      syncMusicIcons();
+    }
+
+    // Botón manual de Play / Pausa (obedece siempre al estado real del reproductor)
+    musicToggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (audio.paused) {
+        tryPlayMusic();
+      } else {
+        pauseMusic();
+      }
+    });
+
+    /* 3. Sistema de Auto-Scroll suave que se detiene cuando el usuario desliza por su cuenta */
+    let autoScrollDelayTimer = null;
+    let autoScrollRafId = null;
+    let isAutoScrolling = false;
+    let lastFrameTime = null;
+    let pixelRemainder = 0;
+    const SCROLL_SPEED_PX_PER_SEC = 75; // Velocidad suave de lectura (píxeles por segundo)
+
+    function stopAutoScroll() {
+      if (autoScrollDelayTimer) {
+        clearTimeout(autoScrollDelayTimer);
+        autoScrollDelayTimer = null;
+      }
+      if (autoScrollRafId) {
+        cancelAnimationFrame(autoScrollRafId);
+        autoScrollRafId = null;
+      }
+      if (isAutoScrolling) {
+        isAutoScrolling = false;
+        document.documentElement.style.scrollBehavior = 'smooth';
+      }
+      removeUserScrollListeners();
+    }
+
+    function onUserManualInteraction(e) {
+      // No detener el auto-scroll si el usuario únicamente tocó el botón de música
+      if (e.target && e.target.closest('#music-toggle-btn')) {
+        return;
+      }
+      if (e.type === 'keydown') {
+        const scrollKeys = ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Space', ' ', 'Home', 'End'];
+        if (!scrollKeys.includes(e.key)) return;
+      }
+      stopAutoScroll();
+    }
+
+    function addUserScrollListeners() {
+      window.addEventListener('wheel', onUserManualInteraction, { passive: true });
+      window.addEventListener('touchstart', onUserManualInteraction, { passive: true });
+      window.addEventListener('touchmove', onUserManualInteraction, { passive: true });
+      window.addEventListener('mousedown', onUserManualInteraction, { passive: true });
+      window.addEventListener('keydown', onUserManualInteraction, { passive: true });
+    }
+
+    function removeUserScrollListeners() {
+      window.removeEventListener('wheel', onUserManualInteraction);
+      window.removeEventListener('touchstart', onUserManualInteraction);
+      window.removeEventListener('touchmove', onUserManualInteraction);
+      window.removeEventListener('mousedown', onUserManualInteraction);
+      window.removeEventListener('keydown', onUserManualInteraction);
+    }
+
+    function autoScrollStep(timestamp) {
+      if (!isAutoScrolling) return;
+
+      if (!lastFrameTime) lastFrameTime = timestamp;
+      const deltaMs = timestamp - lastFrameTime;
+      lastFrameTime = timestamp;
+
+      // Acumulador de subpíxeles para movimiento fluido en cualquier pantalla (60Hz / 120Hz)
+      pixelRemainder += (SCROLL_SPEED_PX_PER_SEC * deltaMs) / 1000;
+      const pixelsToMove = Math.floor(pixelRemainder);
+
+      if (pixelsToMove >= 1) {
+        window.scrollBy(0, pixelsToMove);
+        pixelRemainder -= pixelsToMove;
+      }
+
+      // Detener automáticamente al llegar al final de la invitación
+      const atBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 2);
+      if (atBottom) {
+        stopAutoScroll();
+        return;
+      }
+
+      autoScrollRafId = requestAnimationFrame(autoScrollStep);
+    }
+
+    function startAutoScrollAfterDelay(delayMs = 2500) {
+      addUserScrollListeners();
+      autoScrollDelayTimer = setTimeout(() => {
+        isAutoScrolling = true;
+        lastFrameTime = null;
+        pixelRemainder = 0;
+        // Desactiva temporalmente scroll-behavior: smooth de CSS para evitar tirones cuadro a cuadro
+        document.documentElement.style.scrollBehavior = 'auto';
+        autoScrollRafId = requestAnimationFrame(autoScrollStep);
+      }, delayMs);
+    }
+
+    /* 4. Evento al tocar el sello de lacre: abre el sobre, inicia música y programa el auto-scroll */
+    let envelopeOpened = false;
+
+    openEnvelopeBtn.addEventListener('click', () => {
+      if (envelopeOpened) return;
+      envelopeOpened = true;
+
+      envelopeScreen.classList.add('opening');
+      tryPlayMusic();
+
+      setTimeout(() => {
+        envelopeScreen.classList.add('hidden');
+        document.body.classList.remove('no-scroll');
+        document.body.classList.add('invitation-opened');
+
+        // Espera 2.5 segundos para apreciar la portada antes de deslizar automáticamente
+        startAutoScrollAfterDelay(2500);
+      }, 380);
+    });
 
     /* 5. Lógica de la cuenta regresiva (27 de noviembre de 2026 a las 09:00 a.m.) */
     const weddingDate = new Date(2026, 10, 27, 9, 0, 0).getTime();
